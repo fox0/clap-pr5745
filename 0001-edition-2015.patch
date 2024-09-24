@@ -1,0 +1,56 @@
+From 6895c3d754deff8095c644bf3ba07827239d4ec4 Mon Sep 17 00:00:00 2001
+From: fox0 <15684995+fox0@users.noreply.github.com>
+Date: Tue, 24 Sep 2024 19:16:29 +0700
+Subject: [PATCH 1/2] edition = "2015"
+
+---
+ Cargo.toml             | 2 +-
+ clap_derive/src/lib.rs | 6 ++++++
+ fox/fox.rs             | 2 ++
+ 3 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index f76e177..4d5e87c 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -5,7 +5,7 @@ members = [
+ ]
+ 
+ [workspace.package]
+-edition = "2021"
++edition = "2015"
+ 
+ repository = "https://none"
+ license = "MIT OR Apache-2.0"
+diff --git a/clap_derive/src/lib.rs b/clap_derive/src/lib.rs
+index 760c5b5..b4b0bf7 100644
+--- a/clap_derive/src/lib.rs
++++ b/clap_derive/src/lib.rs
+@@ -20,6 +20,12 @@
+ #![warn(clippy::print_stderr)]
+ #![warn(clippy::print_stdout)]
+ 
++extern crate heck;
++extern crate proc_macro;
++extern crate proc_macro2;
++extern crate quote;
++extern crate syn;
++
+ use proc_macro::TokenStream;
+ use syn::{parse_macro_input, DeriveInput};
+ use syn::{Data, DataStruct, Fields};
+diff --git a/fox/fox.rs b/fox/fox.rs
+index 611e56d..49b67f0 100644
+--- a/fox/fox.rs
++++ b/fox/fox.rs
+@@ -1,5 +1,7 @@
+ use clap::Parser;
+ 
++extern crate clap;
++
+ #[derive(Debug, Parser)]
+ struct Args {
+     kilo: i32
+-- 
+2.39.2
+

@@ -1,0 +1,112 @@
+From ca66593b5d9d309902c387d9857e688f67b0e876 Mon Sep 17 00:00:00 2001
+From: fox0 <15684995+fox0@users.noreply.github.com>
+Date: Tue, 24 Sep 2024 19:18:46 +0700
+Subject: [PATCH 2/2] fix(complete): Build issues clap_derive as override a
+ dependency
+
+---
+ clap_derive/src/derives/mod.rs |  6 +++---
+ clap_derive/src/item.rs        | 36 +++++++++++++++-------------------
+ clap_derive/src/utils/mod.rs   | 10 +++-------
+ 3 files changed, 22 insertions(+), 30 deletions(-)
+
+diff --git a/clap_derive/src/derives/mod.rs b/clap_derive/src/derives/mod.rs
+index 429e635..84d1027 100644
+--- a/clap_derive/src/derives/mod.rs
++++ b/clap_derive/src/derives/mod.rs
+@@ -17,7 +17,7 @@ mod parser;
+ mod subcommand;
+ mod value_enum;
+ 
++pub(crate) use self::args::derive_args;
+ pub(crate) use self::parser::derive_parser;
+-pub(crate) use args::derive_args;
+-pub(crate) use subcommand::derive_subcommand;
+-pub(crate) use value_enum::derive_value_enum;
++pub(crate) use self::subcommand::derive_subcommand;
++pub(crate) use self::value_enum::derive_value_enum;
+diff --git a/clap_derive/src/item.rs b/clap_derive/src/item.rs
+index e48b200..3f90243 100644
+--- a/clap_derive/src/item.rs
++++ b/clap_derive/src/item.rs
+@@ -1413,21 +1413,19 @@ pub(crate) enum Name {
+ 
+ impl Name {
+     pub(crate) fn translate(self, style: CasingStyle) -> TokenStream {
+-        use CasingStyle::{Camel, Kebab, Lower, Pascal, ScreamingSnake, Snake, Upper, Verbatim};
+-
+         match self {
+             Name::Assigned(tokens) => tokens,
+             Name::Derived(ident) => {
+                 let s = ident.unraw().to_string();
+                 let s = match style {
+-                    Pascal => s.to_upper_camel_case(),
+-                    Kebab => s.to_kebab_case(),
+-                    Camel => s.to_lower_camel_case(),
+-                    ScreamingSnake => s.to_shouty_snake_case(),
+-                    Snake => s.to_snake_case(),
+-                    Lower => s.to_snake_case().replace('_', ""),
+-                    Upper => s.to_shouty_snake_case().replace('_', ""),
+-                    Verbatim => s,
++                    CasingStyle::Pascal => s.to_upper_camel_case(),
++                    CasingStyle::Kebab => s.to_kebab_case(),
++                    CasingStyle::Camel => s.to_lower_camel_case(),
++                    CasingStyle::ScreamingSnake => s.to_shouty_snake_case(),
++                    CasingStyle::Snake => s.to_snake_case(),
++                    CasingStyle::Lower => s.to_snake_case().replace('_', ""),
++                    CasingStyle::Upper => s.to_shouty_snake_case().replace('_', ""),
++                    CasingStyle::Verbatim => s,
+                 };
+                 quote_spanned!(ident.span()=> #s)
+             }
+@@ -1435,21 +1433,19 @@ impl Name {
+     }
+ 
+     pub(crate) fn translate_char(self, style: CasingStyle) -> TokenStream {
+-        use CasingStyle::{Camel, Kebab, Lower, Pascal, ScreamingSnake, Snake, Upper, Verbatim};
+-
+         match self {
+             Name::Assigned(tokens) => quote!( (#tokens).chars().next().unwrap() ),
+             Name::Derived(ident) => {
+                 let s = ident.unraw().to_string();
+                 let s = match style {
+-                    Pascal => s.to_upper_camel_case(),
+-                    Kebab => s.to_kebab_case(),
+-                    Camel => s.to_lower_camel_case(),
+-                    ScreamingSnake => s.to_shouty_snake_case(),
+-                    Snake => s.to_snake_case(),
+-                    Lower => s.to_snake_case(),
+-                    Upper => s.to_shouty_snake_case(),
+-                    Verbatim => s,
++                    CasingStyle::Pascal => s.to_upper_camel_case(),
++                    CasingStyle::Kebab => s.to_kebab_case(),
++                    CasingStyle::Camel => s.to_lower_camel_case(),
++                    CasingStyle::ScreamingSnake => s.to_shouty_snake_case(),
++                    CasingStyle::Snake => s.to_snake_case(),
++                    CasingStyle::Lower => s.to_snake_case(),
++                    CasingStyle::Upper => s.to_shouty_snake_case(),
++                    CasingStyle::Verbatim => s,
+                 };
+ 
+                 let s = s.chars().next().unwrap();
+diff --git a/clap_derive/src/utils/mod.rs b/clap_derive/src/utils/mod.rs
+index c7e4b8e..3add706 100644
+--- a/clap_derive/src/utils/mod.rs
++++ b/clap_derive/src/utils/mod.rs
+@@ -4,10 +4,6 @@ mod doc_comments;
+ mod spanned;
+ mod ty;
+ 
+-pub(crate) use doc_comments::extract_doc_comment;
+-pub(crate) use doc_comments::format_doc_comment;
+-
+-pub(crate) use self::{
+-    spanned::Sp,
+-    ty::{inner_type, is_simple_ty, sub_type, subty_if_name, Ty},
+-};
++pub(crate) use self::doc_comments::{extract_doc_comment, format_doc_comment};
++pub(crate) use self::spanned::Sp;
++pub(crate) use self::ty::{inner_type, is_simple_ty, sub_type, subty_if_name, Ty};
+-- 
+2.39.2
+
