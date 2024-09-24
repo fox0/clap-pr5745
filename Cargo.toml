@@ -1,0 +1,25 @@
+[workspace]
+resolver = "2"
+members = [
+  "fox",
+]
+
+[workspace.package]
+edition = "2021"
+
+repository = "https://none"
+license = "MIT OR Apache-2.0"
+rust-version = "1.74"
+include = []
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "warn"
+
+[workspace.lints.clippy]
+bool_assert_comparison = "allow"
+
+[workspace.dependencies]
+clap = { version = "4", features = ["derive"] }
+
+[patch.crates-io]
+clap_derive = { path = "./clap_derive" }
